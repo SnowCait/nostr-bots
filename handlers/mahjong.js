@@ -2,8 +2,13 @@ import { getEventHash, getPublicKey, getSignature } from 'nostr-tools';
 import 'websocket-polyfill'
 import { getSeckey } from '../libs/nostr.js';
 import { shuffle } from '../libs/array.js';
+import mahjongEmojis from '../resources/mahjong_emojis.json' assert { type: 'json' }
+import mahjongEmojiKeys from '../resources/mahjong_emoji_keys.json' assert { type: 'json' }
 
 const nsecKey = 'nostr-test-bot-nsec';
+const customEmojiMode = true
+const mahjongEmojisMap = new Map(Object.entries(mahjongEmojis))
+const mahjongEmojiKeysMap = new Map(Object.entries(mahjongEmojiKeys))
 
 export const handler = async (e) => {
   console.log('[request]', JSON.stringify(e))
@@ -25,16 +30,30 @@ export const handler = async (e) => {
   hand.sort();
   console.log('[hand]', hand);
 
-  const event = {
-    kind: 1,
-    created_at: Math.floor(Date.now() / 1000),
-    tags: [
-      ['e', requestEvent.id, '', 'root'],
-      ['p', requestEvent.pubkey]
-    ],
-    content: hand.join(''),
-    pubkey
-  }
+  const event = customEmojiMode
+    ? {
+      kind: 1,
+      created_at: Math.floor(Date.now() / 1000),
+      tags: [
+        ['e', requestEvent.id, '', 'root'],
+        ['p', requestEvent.pubkey],
+        ...Object.entries(mahjongEmojiKeys)
+          .filter(([emoji]) => hand.includes(emoji))
+          .map(([, key]) => ['emoji', key, mahjongEmojisMap.get(key)])
+      ],
+      content: hand.map(x => `:${mahjongEmojiKeysMap.get(x)}:`).join(''),
+      pubkey
+    }
+    : {
+      kind: 1,
+      created_at: Math.floor(Date.now() / 1000),
+      tags: [
+        ['e', requestEvent.id, '', 'root'],
+        ['p', requestEvent.pubkey]
+      ],
+      content: hand.join(''),
+      pubkey
+    }
 
   event.id = getEventHash(event)
   event.sig = getSignature(event, seckey)
