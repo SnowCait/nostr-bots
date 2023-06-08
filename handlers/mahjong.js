@@ -1,5 +1,7 @@
-import { getEventHash, getPublicKey, getSignature, nip19 } from 'nostr-tools';
+import { getEventHash, getPublicKey, getSignature } from 'nostr-tools';
 import 'websocket-polyfill'
+import { getSeckey } from '../libs/nostr.js';
+import { shuffle } from '../libs/array.js';
 
 const nsecKey = 'nostr-test-bot-nsec';
 
@@ -10,13 +12,7 @@ export const handler = async (e) => {
 
   const requestEvent = JSON.parse(json)
 
-  const nsec = await getNsec(nsecKey)
-  const { type, data: seckey } = nip19.decode(nsec)
-
-  if (type !== 'nsec' || typeof seckey !== 'string') {
-    throw new Error(`[invalid nsec] type: ${type}, typeof seckey: ${typeof seckey}`)
-  }
-
+  const seckey = await getSeckey(nsecKey)
   const pubkey = getPublicKey(seckey)
 
   const tiles = true
@@ -49,26 +45,3 @@ export const handler = async (e) => {
     body: JSON.stringify(event)
   };
 };
-
-function shuffle(array) {
-  for (let i = array.length - 1; i > 0; i--) {
-    let j = Math.floor(Math.random() * (i + 1)); // 0 から i のランダムなインデックス
-    [array[i], array[j]] = [array[j], array[i]]; // 要素を入れ替えます
-  }
-}
-
-async function getNsec (name) {
-  const response = await fetch(`http://localhost:2773/systemsmanager/parameters/get?name=${name}&withDecryption=true`, {
-    method: 'GET',
-    headers: {
-      'X-Aws-Parameters-Secrets-Token': process.env.AWS_SESSION_TOKEN
-    }
-  })
-
-  if (!response.ok) {
-    throw new Error(await response.text())
-  }
-
-  const secrets = await response.json()
-  return secrets.Parameter.Value
-}
