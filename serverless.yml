@@ -3,12 +3,26 @@ frameworkVersion: '3'
 
 provider:
   name: aws
+  region: ap-northeast-1
   runtime: nodejs18.x
+  memorySize: 128
+  architecture: arm64
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - ssm:GetParameter
+            - kms:Decrypt
+          Resource:
+            - '*'
 
 functions:
-  api:
-    handler: index.handler
+  mahjong:
+    handler: handlers/mahjong.handler
+    layers:
+      - arn:aws:lambda:ap-northeast-1:133490724326:layer:AWS-Parameters-and-Secrets-Lambda-Extension-Arm64:2
     events:
       - httpApi:
           path: /
-          method: get
+          method: post
