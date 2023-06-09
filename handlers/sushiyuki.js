@@ -4,6 +4,7 @@ import { getSeckey } from '../libs/nostr.js';
 
 const nsecKey = 'nostr-test-bot-nsec';
 const sushiyukiUrl = 'https://awayuki.github.io/awayuki_emojis.json'
+const customEmojiMode = false
 
 export const handler = async (e) => {
   console.log('[request]', JSON.stringify(e))
@@ -22,17 +23,28 @@ export const handler = async (e) => {
 
   console.log('[selected]', key, sushiyukis.get(key))
 
-  const event = {
-    kind: 1,
-    created_at: Math.floor(Date.now() / 1000),
-    tags: [
-      ['e', requestEvent.id, '', 'root'],
-      ['p', requestEvent.pubkey],
-      ['emoji', key, sushiyukis.get(key)]
-    ],
-    content: `:${key}:`,
-    pubkey
-  }
+  const event = customEmojiMode
+    ? {
+      kind: 1,
+      created_at: Math.floor(Date.now() / 1000),
+      tags: [
+        ['e', requestEvent.id, '', 'root'],
+        ['p', requestEvent.pubkey],
+        ['emoji', key, sushiyukis.get(key)]
+      ],
+      content: `:${key}:`,
+      pubkey
+    }
+    : {
+      kind: 1,
+      created_at: Math.floor(Date.now() / 1000),
+      tags: [
+        ['e', requestEvent.id, '', 'root'],
+        ['p', requestEvent.pubkey]
+      ],
+      content: sushiyukis.get(key),
+      pubkey
+    }
 
   event.id = getEventHash(event)
   event.sig = getSignature(event, seckey)
