@@ -42,3 +42,12 @@ functions:
       - httpApi:
           path: /sushiyuki
           method: post
+  req:
+    handler: handlers/req.handler
+    layers:
+      - arn:aws:lambda:ap-northeast-1:133490724326:layer:AWS-Parameters-and-Secrets-Lambda-Extension-Arm64:2
+    events:
+      - httpApi:
+          path: /req
+          method: post
+    timeout: 15
