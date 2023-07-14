@@ -16,13 +16,16 @@ export const handler = async (e) => {
   const pubkey = getPublicKey(seckey)
 
   const fromRegexp = /from:nostr:(npub1[a-z0-9]{6,})/g;
+  const toRegexp = /to:nostr:(npub1[a-z0-9]{6,})/g;
   const kindRegexp = /kind:(\d+)/g;
   const fromMatches = requestEvent.content.matchAll(fromRegexp)
+  const toMatches = requestEvent.content.matchAll(toRegexp)
   const kindMatches = requestEvent.content.matchAll(kindRegexp)
 
-  const pubkeys = [...fromMatches].map(match => match[1]).map(npub => nip19.decode(npub).data)
+  const fromPubkeys = [...fromMatches].map(match => match[1]).map(npub => nip19.decode(npub).data)
+  const toPubkeys = [...toMatches].map(match => match[1]).map(npub => nip19.decode(npub).data)
   const kinds = [...kindMatches].map(match => Number(match[1]))
-  console.log('[matches]', pubkeys, kinds)
+  console.log('[matches]', fromPubkeys, toPubkeys, kinds)
   if (kinds.length === 0) {
     kinds.push(Kind.Text)
   }
@@ -58,8 +61,11 @@ export const handler = async (e) => {
     search: keyword,
     kinds
   };
-  if (pubkeys.length > 0) {
-    filter.authors = pubkeys
+  if (fromPubkeys.length > 0) {
+    filter.authors = fromPubkeys
+  }
+  if (toPubkeys.length > 0) {
+    filter['#p'] = toPubkeys
   }
   console.log('[filter]', filter);
 
