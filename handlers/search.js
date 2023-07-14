@@ -80,7 +80,9 @@ export const handler = async (e) => {
       ['e', requestEvent.id, '', 'root'],
       ['p', requestEvent.pubkey]
     ],
-    content: events.map(event => `nostr:${nip19.neventEncode({id: event.id})}`).join('\n'),
+    content: events.length === 0
+      ? 'No results.'
+      : events.map(event => `nostr:${nip19.neventEncode({id: event.id})}`).join('\n'),
     pubkey
   }
 
