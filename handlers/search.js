@@ -19,10 +19,10 @@ export const handler = async (e) => {
   const kindRegexp = /kind:(\d+)/g;
   const fromMatches = requestEvent.content.matchAll(fromRegexp)
   const kindMatches = requestEvent.content.matchAll(kindRegexp)
-  console.log('[matches]', [...fromMatches], [...kindMatches])
 
   const pubkeys = [...fromMatches].map(match => match[1]).map(npub => nip19.decode(npub).data)
   const kinds = [...kindMatches].map(match => Number(match[1]))
+  console.log('[matches]', pubkeys, kinds)
   if (kinds.length === 0) {
     kinds.push(Kind.Text)
   }
