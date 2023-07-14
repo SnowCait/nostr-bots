@@ -51,3 +51,12 @@ functions:
           path: /req
           method: post
     timeout: 15
+  search:
+    handler: handlers/search.handler
+    layers:
+      - arn:aws:lambda:ap-northeast-1:133490724326:layer:AWS-Parameters-and-Secrets-Lambda-Extension-Arm64:2
+    events:
+      - httpApi:
+          path: /search
+          method: post
+    timeout: 15
