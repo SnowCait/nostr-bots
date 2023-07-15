@@ -32,7 +32,7 @@ export const handler = async (e) => {
     kinds.push(Kind.Text)
   }
   const keyword = requestEvent.content
-    .replace('nostr:npub19rfhux6gjsmu0rtyendlrazvyr3lqy7m506vy4emy4vehf3s3s3qhhje7x', '')
+    .replace('nostr:npub1n2uhxrph9fgyp3u2xxqxhuz0vykt8dw8ehvw5uaesl0z4mvatpas0ngm26', '')
     .replaceAll(fromRegexp, '')
     .replaceAll(toRegexp, '')
     .replaceAll(new RegExp(`(${hashtags.map((x) => `#${x}`).join('|')})`, 'gu'), '')
