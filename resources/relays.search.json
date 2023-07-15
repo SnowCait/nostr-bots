@@ -1,4 +1,5 @@
 [
     "wss://relay.nostr.band",
-    "wss://search.nos.today"
+    "wss://search.nos.today",
+    "wss://nostrja-kari-nip50.heguro.com"
 ]
