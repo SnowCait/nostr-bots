@@ -15,57 +15,44 @@ export const handler = async (e) => {
   const seckey = await getSeckey(nsecKey)
   const pubkey = getPublicKey(seckey)
 
-  const fromRegexp = /from:nostr:(npub1[a-z0-9]{6,})/g;
-  const toRegexp = /to:nostr:(npub1[a-z0-9]{6,})/g;
-  const kindRegexp = /kind:(\d+)/g;
+  const fromRegexp = /from:nostr:(npub1[a-z0-9]{6,})/g
+  const toRegexp = /to:nostr:(npub1[a-z0-9]{6,})/g
+  const kindRegexp = /kind:(\d+)/g
   const fromMatches = requestEvent.content.matchAll(fromRegexp)
   const toMatches = requestEvent.content.matchAll(toRegexp)
   const kindMatches = requestEvent.content.matchAll(kindRegexp)
 
   const fromPubkeys = [...fromMatches].map(match => match[1]).map(npub => nip19.decode(npub).data)
   const toPubkeys = [...toMatches].map(match => match[1]).map(npub => nip19.decode(npub).data)
+  const hashtags = requestEvent.tags.filter(([tagName]) => tagName === 't').map(([, hashtag]) => hashtag)
+  hashtags.sort((x, y) => y.length - x.length)
   const kinds = [...kindMatches].map(match => Number(match[1]))
-  console.log('[matches]', fromPubkeys, toPubkeys, kinds)
+  console.log('[matches]', fromPubkeys, toPubkeys, hashtags, kinds)
   if (kinds.length === 0) {
     kinds.push(Kind.Text)
   }
   const keyword = requestEvent.content
     .replace('nostr:npub19rfhux6gjsmu0rtyendlrazvyr3lqy7m506vy4emy4vehf3s3s3qhhje7x', '')
-    .replace(fromRegexp, '')
+    .replaceAll(fromRegexp, '')
+    .replaceAll(toRegexp, '')
+    .replaceAll(new RegExp(`(${hashtags.map((x) => `#${x}`).join('|')})`, 'gu'), '')
     .trim();
-  if (keyword === '') {
-    console.warn('[invalid content]', requestEvent.content);
-    const event = {
-      kind: 1,
-      created_at: Math.floor(Date.now() / 1000),
-      tags: [
-        ['e', requestEvent.id, '', 'root'],
-        ['p', requestEvent.pubkey]
-      ],
-      content: 'Bad request.',
-      pubkey
-    }
-  
-    event.id = getEventHash(event)
-    event.sig = getSignature(event, seckey)
-    console.log('[event]', event)
-  
-    return {
-      statusCode: 200,
-      body: JSON.stringify(event)
-    };
-  }
 
   /** @param {import('nostr-tools').Filter} */
   let filter = {
-    search: keyword,
     kinds
   };
+  if (keyword.length > 0) {
+    filter.search = keyword
+  }
   if (fromPubkeys.length > 0) {
     filter.authors = fromPubkeys
   }
   if (toPubkeys.length > 0) {
     filter['#p'] = toPubkeys
+  }
+  if (hashtags.length > 0) {
+    filter['#t'] = hashtags
   }
   console.log('[filter]', filter);
 
