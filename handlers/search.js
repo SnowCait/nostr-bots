@@ -15,15 +15,15 @@ export const handler = async (e) => {
   const seckey = await getSeckey(nsecKey)
   const pubkey = getPublicKey(seckey)
 
-  const fromRegexp = /from:nostr:(npub1[a-z0-9]{6,})/g
-  const toRegexp = /to:nostr:(npub1[a-z0-9]{6,})/g
+  const fromRegexp = /from:(nostr:)?(npub1[a-z0-9]{6,})/g
+  const toRegexp = /to:(nostr:)?(npub1[a-z0-9]{6,})/g
   const kindRegexp = /kind:(\d+)/g
   const fromMatches = requestEvent.content.matchAll(fromRegexp)
   const toMatches = requestEvent.content.matchAll(toRegexp)
   const kindMatches = requestEvent.content.matchAll(kindRegexp)
 
-  const fromPubkeys = [...fromMatches].map(match => match[1]).map(npub => nip19.decode(npub).data)
-  const toPubkeys = [...toMatches].map(match => match[1]).map(npub => nip19.decode(npub).data)
+  const fromPubkeys = [...fromMatches].map(match => match[2]).map(npub => nip19.decode(npub).data)
+  const toPubkeys = [...toMatches].map(match => match[2]).map(npub => nip19.decode(npub).data)
   const hashtags = requestEvent.tags.filter(([tagName]) => tagName === 't').map(([, hashtag]) => hashtag)
   hashtags.sort((x, y) => y.length - x.length)
   const kinds = [...kindMatches].map(match => Number(match[1]))
