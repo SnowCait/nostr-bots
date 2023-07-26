@@ -1,7 +1,8 @@
 import { Kind, SimplePool, getEventHash, getPublicKey, getSignature, nip19 } from 'nostr-tools';
 import 'websocket-polyfill'
 import { getSeckey } from '../libs/nostr.js';
-import relays from '../resources/relays.search.json' assert { type: 'json' };
+import readRelays from '../resources/relays.json' assert { type: 'json' };
+import searchRelays from '../resources/relays.search.json' assert { type: 'json' };
 
 const nsecKey = 'nostr-search-bot-nsec';
 
@@ -64,6 +65,9 @@ export const handler = async (e) => {
   if (filter.until === undefined) {
     filter.until = requestEvent.created_at - 1;
   }
+
+  const relays = filter.search !== undefined ? searchRelays : readRelays;
+  console.log('[relays]', relays);
 
   const pool = new SimplePool()
   const events = await pool.list(relays, [filter])
