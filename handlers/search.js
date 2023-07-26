@@ -35,6 +35,7 @@ export const handler = async (e) => {
     .replace('nostr:npub1n2uhxrph9fgyp3u2xxqxhuz0vykt8dw8ehvw5uaesl0z4mvatpas0ngm26', '')
     .replaceAll(fromRegexp, '')
     .replaceAll(toRegexp, '')
+    .replaceAll(kindRegexp, '')
     .replaceAll(new RegExp(`(${hashtags.map((x) => `#${x}`).join('|')})`, 'gu'), '')
     .trim();
 
