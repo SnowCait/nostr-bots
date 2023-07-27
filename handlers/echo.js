@@ -1,3 +1,4 @@
+import { getEventHash, getPublicKey, getSignature } from 'nostr-tools';
 import 'websocket-polyfill'
 import { getSeckey } from '../libs/nostr.js';
 
