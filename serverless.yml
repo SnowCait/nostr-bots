@@ -18,6 +18,14 @@ provider:
             - '*'
 
 functions:
+  echo:
+    handler: handlers/echo.handler
+    layers:
+      - arn:aws:lambda:ap-northeast-1:133490724326:layer:AWS-Parameters-and-Secrets-Lambda-Extension-Arm64:2
+    events:
+      - httpApi:
+          path: /echo
+          method: post
   mahjong:
     handler: handlers/mahjong.handler
     layers:
