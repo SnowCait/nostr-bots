@@ -17,7 +17,7 @@ export const handler = async (e) => {
   const match = requestEvent.content.match(/echo (.+)/)
 
   const event = {
-    kind: 1,
+    kind: requestEvent.kind,
     created_at: Math.floor(Date.now() / 1000),
     tags: [],
     content: match?.[1] ?? 'Error',
