@@ -32,7 +32,7 @@ export const handler = async (e) => {
   content += `\nSum: ${sum}`
 
   const event = {
-    kind: 1,
+    kind: requestEvent.kind,
     created_at: Math.floor(Date.now() / 1000),
     tags: [
       ['e', requestEvent.id, '', 'root'],
