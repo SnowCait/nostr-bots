@@ -74,7 +74,7 @@ export const handler = async (e) => {
   console.log('[events]', events)
 
   const event = {
-    kind: 1,
+    kind: requestEvent.kind,
     created_at: Math.floor(Date.now() / 1000),
     tags: [
       ['e', requestEvent.id, '', 'root'],
