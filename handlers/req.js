@@ -19,7 +19,7 @@ export const handler = async (e) => {
   if (match === null) {
     console.warn('[invalid content]', requestEvent.content);
     const event = {
-      kind: 1,
+      kind: requestEvent.kind,
       created_at: Math.floor(Date.now() / 1000),
       tags: [
         ['e', requestEvent.id, '', 'root'],
@@ -47,7 +47,7 @@ export const handler = async (e) => {
   } catch (error) {
     console.warn('[invalid filter]', requestEvent.content);
     const event = {
-      kind: 1,
+      kind: requestEvent.kind,
       created_at: Math.floor(Date.now() / 1000),
       tags: [
         ['e', requestEvent.id, '', 'root'],
@@ -79,7 +79,7 @@ export const handler = async (e) => {
   const events = await pool.list(relays, [filter]);
 
   const event = {
-    kind: 1,
+    kind: requestEvent.kind,
     created_at: Math.floor(Date.now() / 1000),
     tags: [
       ['e', requestEvent.id, '', 'root'],
