@@ -32,7 +32,7 @@ export const handler = async (e) => {
 
   const event = customEmojiMode
     ? {
-      kind: 1,
+      kind: requestEvent.kind,
       created_at: Math.floor(Date.now() / 1000),
       tags: [
         ['e', requestEvent.id, '', 'root'],
@@ -45,7 +45,7 @@ export const handler = async (e) => {
       pubkey
     }
     : {
-      kind: 1,
+      kind: requestEvent.kind,
       created_at: Math.floor(Date.now() / 1000),
       tags: [
         ['e', requestEvent.id, '', 'root'],
