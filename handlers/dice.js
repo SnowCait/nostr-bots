@@ -1,6 +1,6 @@
 import { getEventHash, getPublicKey, getSignature } from 'nostr-tools';
 import 'websocket-polyfill'
-import { getSeckey } from '../libs/nostr.js';
+import { getSeckey, replyTags } from '../libs/nostr.js';
 
 const nsecKey = 'nostr-test-bot-nsec';
 
@@ -34,10 +34,7 @@ export const handler = async (e) => {
   const event = {
     kind: requestEvent.kind,
     created_at: Math.floor(Date.now() / 1000),
-    tags: [
-      ['e', requestEvent.id, '', 'root'],
-      ['p', requestEvent.pubkey]
-    ],
+    tags: replyTags(requestEvent),
     content,
     pubkey
   }

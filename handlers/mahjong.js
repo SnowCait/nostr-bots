@@ -1,6 +1,6 @@
 import { getEventHash, getPublicKey, getSignature } from 'nostr-tools';
 import 'websocket-polyfill'
-import { getSeckey } from '../libs/nostr.js';
+import { getSeckey, replyTags } from '../libs/nostr.js';
 import { shuffle } from '../libs/array.js';
 import mahjongEmojis from '../resources/mahjong_emojis.json' assert { type: 'json' }
 import mahjongEmojiKeys from '../resources/mahjong_emoji_keys.json' assert { type: 'json' }
@@ -35,8 +35,7 @@ export const handler = async (e) => {
       kind: requestEvent.kind,
       created_at: Math.floor(Date.now() / 1000),
       tags: [
-        ['e', requestEvent.id, '', 'root'],
-        ['p', requestEvent.pubkey],
+        ...replyTags(requestEvent),
         ...Object.entries(mahjongEmojiKeys)
           .filter(([emoji]) => hand.includes(emoji))
           .map(([, key]) => ['emoji', key, mahjongEmojisMap.get(key)])
@@ -47,10 +46,7 @@ export const handler = async (e) => {
     : {
       kind: requestEvent.kind,
       created_at: Math.floor(Date.now() / 1000),
-      tags: [
-        ['e', requestEvent.id, '', 'root'],
-        ['p', requestEvent.pubkey]
-      ],
+      tags: replyTags(requestEvent),
       content: hand.join(''),
       pubkey
     }

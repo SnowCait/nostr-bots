@@ -1,6 +1,6 @@
 import { SimplePool, getEventHash, getPublicKey, getSignature } from 'nostr-tools';
 import 'websocket-polyfill'
-import { getSeckey } from '../libs/nostr.js';
+import { getSeckey, replyTags } from '../libs/nostr.js';
 import relays from '../resources/relays.json' assert { type: 'json' };
 
 const nsecKey = 'nostr-req-bot-nsec';
@@ -21,10 +21,7 @@ export const handler = async (e) => {
     const event = {
       kind: requestEvent.kind,
       created_at: Math.floor(Date.now() / 1000),
-      tags: [
-        ['e', requestEvent.id, '', 'root'],
-        ['p', requestEvent.pubkey]
-      ],
+      tags: replyTags(requestEvent),
       content: 'Bad request.',
       pubkey
     }
@@ -49,10 +46,7 @@ export const handler = async (e) => {
     const event = {
       kind: requestEvent.kind,
       created_at: Math.floor(Date.now() / 1000),
-      tags: [
-        ['e', requestEvent.id, '', 'root'],
-        ['p', requestEvent.pubkey]
-      ],
+      tags: replyTags(requestEvent),
       content: 'Bad filter.',
       pubkey
     }
@@ -81,10 +75,7 @@ export const handler = async (e) => {
   const event = {
     kind: requestEvent.kind,
     created_at: Math.floor(Date.now() / 1000),
-    tags: [
-      ['e', requestEvent.id, '', 'root'],
-      ['p', requestEvent.pubkey]
-    ],
+    tags: replyTags(requestEvent),
     content: JSON.stringify(events, null, 2),
     pubkey
   }

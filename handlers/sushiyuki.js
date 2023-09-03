@@ -1,6 +1,6 @@
 import { getEventHash, getPublicKey, getSignature } from 'nostr-tools';
 import 'websocket-polyfill'
-import { getSeckey } from '../libs/nostr.js';
+import { getSeckey, replyTags } from '../libs/nostr.js';
 
 const nsecKey = 'nostr-test-bot-nsec';
 const sushiyukiUrl = 'https://awayuki.github.io/awayuki_emojis.json'
@@ -28,8 +28,7 @@ export const handler = async (e) => {
       kind: requestEvent.kind,
       created_at: Math.floor(Date.now() / 1000),
       tags: [
-        ['e', requestEvent.id, '', 'root'],
-        ['p', requestEvent.pubkey],
+        ...replyTags(requestEvent),
         ['emoji', key, sushiyukis.get(key)]
       ],
       content: `:${key}:`,
@@ -38,10 +37,7 @@ export const handler = async (e) => {
     : {
       kind: requestEvent.kind,
       created_at: Math.floor(Date.now() / 1000),
-      tags: [
-        ['e', requestEvent.id, '', 'root'],
-        ['p', requestEvent.pubkey]
-      ],
+      tags: replyTags(requestEvent),
       content: sushiyukis.get(key),
       pubkey
     }

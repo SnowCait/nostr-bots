@@ -1,6 +1,6 @@
 import { Kind, SimplePool, getEventHash, getPublicKey, getSignature, nip19 } from 'nostr-tools';
 import 'websocket-polyfill'
-import { getSeckey } from '../libs/nostr.js';
+import { getSeckey, replyTags } from '../libs/nostr.js';
 import readRelays from '../resources/relays.json' assert { type: 'json' };
 import searchRelays from '../resources/relays.search.json' assert { type: 'json' };
 
@@ -76,10 +76,7 @@ export const handler = async (e) => {
   const event = {
     kind: requestEvent.kind,
     created_at: Math.floor(Date.now() / 1000),
-    tags: [
-      ['e', requestEvent.id, '', 'root'],
-      ['p', requestEvent.pubkey]
-    ],
+    tags: replyTags(requestEvent),
     content: events.length === 0
       ? 'No results.'
       : events.map(event => `nostr:${nip19.neventEncode({id: event.id})}`).join('\n'),
