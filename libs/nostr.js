@@ -1,5 +1,28 @@
 import { nip19 } from "nostr-tools"
 
+export function replyTags(event) {
+  const tags = []
+
+  // e tags
+  const rootTag = event.tags.find(([tagName, , , marker]) => tagName === 'e' && marker === 'root')
+  console.log('[root tag]', rootTag)
+  if (rootTag !== undefined) {
+    tags.push(rootTag, ['e', event.id, '', 'reply'])
+  } else {
+    tags.push(['e', event.id, '', 'root'])
+  }
+
+  // p tags
+  const pTags = event.tags.filter(([tagName]) => tagName === 'p')
+  if (pTags.some(([, pubkey]) => pubkey === event.pubkey)) {
+    tags.push(...pTags)
+  } else {
+    tags.push(...pTags, ['p', event.pubkey])
+  }
+
+  return tags
+}
+
 export async function getSeckey(name) {
   const nsec = await getNsec(name)
   const { type, data: seckey } = nip19.decode(nsec)
