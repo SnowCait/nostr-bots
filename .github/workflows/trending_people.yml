@@ -1,0 +1,18 @@
+name: Trending People
+
+on:
+  schedule:
+    - cron: 0 0 * * *
+
+jobs:
+  follow:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - run: echo "tags=$(curl -sS https://api.nostr.band/v0/trending/profiles | jq -c '.profiles | map(["p", .pubkey])')" >> $GITHUB_ENV
+      - uses: snow-actions/nostr@v1.7.0
+        with:
+          private-key: ${{ secrets.NOSTR_NSEC_TRENDING_PEOPLE }}
+          relays: ${{ vars.NOSTR_RELAYS }}
+          kind: 3
+          tags: ${{ env.tags }}
