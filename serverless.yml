@@ -68,3 +68,21 @@ functions:
           path: /search
           method: post
     timeout: 15
+  random_image_register:
+    handler: handlers/random_image.register
+    layers:
+      - arn:aws:lambda:ap-northeast-1:133490724326:layer:AWS-Parameters-and-Secrets-Lambda-Extension-Arm64:2
+    events:
+      - httpApi:
+          path: /random_image/register
+          method: post
+    timeout: 15
+  random_image_draw:
+    handler: handlers/random_image.draw
+    layers:
+      - arn:aws:lambda:ap-northeast-1:133490724326:layer:AWS-Parameters-and-Secrets-Lambda-Extension-Arm64:2
+    events:
+      - httpApi:
+          path: /random_image/draw
+          method: post
+    timeout: 15

@@ -1,4 +1,11 @@
-import { nip19 } from "nostr-tools"
+import { SimplePool, nip19 } from "nostr-tools"
+
+export const relays = [
+  'wss://yabu.me/',
+  'wss://relay-jp.nostr.wirednet.jp',
+  'wss://relay.nostr.wirednet.jp',
+  'wss://nos.lol'
+]
 
 export function replyTags(event) {
   const tags = []
@@ -48,4 +55,29 @@ async function getNsec (name) {
 
   const secrets = await response.json()
   return secrets.Parameter.Value
+}
+
+export async function publish(event) {
+  return await new Promise((resolve) => {
+    const publishedRelays = new Map()
+    const pool = new SimplePool()
+    const tryClose = () => {
+      if (publishedRelays.size === new Set(relays).size) {
+        console.log('[close]', relays)
+        pool.close(relays)
+        resolve([...publishedRelays].filter(([,success]) => success).length > 0)
+      }
+    }
+    const pub = pool.publish(relays, event)
+    pub.on('ok', (relay) => {
+      console.log('[ok]', relay)
+      publishedRelays.set(relay, true)
+      tryClose()
+    })
+    pub.on('failed', (relay) => {
+      console.warn('[failed]', relay)
+      publishedRelays.set(relay, false)
+      tryClose()
+    })
+  })
 }
