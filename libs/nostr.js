@@ -35,18 +35,17 @@ export async function getSeckey(name) {
 }
 
 async function getNsec (name) {
-    const response = await fetch(`http://localhost:2773/systemsmanager/parameters/get?name=${name}&withDecryption=true`, {
-      method: 'GET',
-      headers: {
-        'X-Aws-Parameters-Secrets-Token': process.env.AWS_SESSION_TOKEN
-      }
-    })
-  
-    if (!response.ok) {
-      throw new Error(await response.text())
+  const response = await fetch(`http://localhost:2773/systemsmanager/parameters/get?name=${name}&withDecryption=true`, {
+    method: 'GET',
+    headers: {
+      'X-Aws-Parameters-Secrets-Token': process.env.AWS_SESSION_TOKEN
     }
-  
-    const secrets = await response.json()
-    return secrets.Parameter.Value
+  })
+
+  if (!response.ok) {
+    throw new Error(await response.text())
   }
-  
+
+  const secrets = await response.json()
+  return secrets.Parameter.Value
+}
