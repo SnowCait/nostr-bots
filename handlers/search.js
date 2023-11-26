@@ -16,6 +16,12 @@ export const handler = async (e) => {
   const seckey = await getSeckey(nsecKey)
   const pubkey = getPublicKey(seckey)
 
+  if (requestEvent.pubkey === pubkey) {
+    return {
+      statusCode: 204
+    };
+  }
+
   const fromRegexp = /from:(nostr:)?(npub1[a-z0-9]{6,})/g
   const toRegexp = /to:(nostr:)?(npub1[a-z0-9]{6,})/g
   const kindRegexp = /kind:(\d+)/g
