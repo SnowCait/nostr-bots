@@ -79,13 +79,14 @@ export const handler = async (e) => {
   const events = await pool.list(relays, [filter])
   console.log('[events]', events)
 
+  const link = `https://nostter.app/search?q=${encodeURIComponent(keyword)}`;
   const event = {
     kind: requestEvent.kind,
     created_at: Math.floor(Date.now() / 1000),
     tags: replyTags(requestEvent),
     content: events.length === 0
-      ? 'No results.'
-      : events.map(event => `nostr:${nip19.neventEncode({id: event.id})}`).join('\n'),
+      ? `No results.\n${link}`
+      : `${link}\n` + events.map(event => `nostr:${nip19.neventEncode({id: event.id})}`).join('\n'),
     pubkey
   }
 
