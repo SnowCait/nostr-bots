@@ -38,8 +38,10 @@ export const handler = async (e) => {
   if (kinds.length === 0) {
     kinds.push(Kind.Text)
   }
-  const keyword = requestEvent.content
+  const query = requestEvent.content
     .replace('nostr:npub1n2uhxrph9fgyp3u2xxqxhuz0vykt8dw8ehvw5uaesl0z4mvatpas0ngm26', '')
+    .trim();
+  const keyword = query
     .replaceAll(fromRegexp, '')
     .replaceAll(toRegexp, '')
     .replaceAll(kindRegexp, '')
@@ -79,14 +81,14 @@ export const handler = async (e) => {
   const events = await pool.list(relays, [filter])
   console.log('[events]', events)
 
-  const link = `https://nostter.app/search?q=${encodeURIComponent(keyword)}`;
+  const link = `https://nostter.app/search?q=${encodeURIComponent(query)}`;
   const event = {
     kind: requestEvent.kind,
     created_at: Math.floor(Date.now() / 1000),
     tags: replyTags(requestEvent),
     content: events.length === 0
       ? `No results.\n${link}`
-      : `${link}\n` + events.map(event => `nostr:${nip19.neventEncode({id: event.id})}`).join('\n'),
+      : `${link}\n` + events.map(event => `nostr:${nip19.neventEncode({ id: event.id })}`).join('\n'),
     pubkey
   }
 
