@@ -88,7 +88,7 @@ export const handler = async (e) => {
     tags: replyTags(requestEvent),
     content: events.length === 0
       ? `No results.\n${link}`
-      : `${link}\n` + events.map(event => `nostr:${nip19.neventEncode({ id: event.id })}`).join('\n'),
+      : events.map(event => `nostr:${nip19.neventEncode({ id: event.id })}`).join('\n') + `\n\nMore: ${link}`,
     pubkey
   }
 
