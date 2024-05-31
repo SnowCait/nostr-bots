@@ -1,5 +1,5 @@
 service: nostr-bots
-frameworkVersion: '3'
+frameworkVersion: "3"
 
 provider:
   name: aws
@@ -15,7 +15,7 @@ provider:
             - ssm:GetParameter
             - kms:Decrypt
           Resource:
-            - '*'
+            - "*"
 
 functions:
   echo:
@@ -86,3 +86,9 @@ functions:
           path: /random_image/draw
           method: post
     timeout: 15
+  publish:
+    handler: handlers/publish.handler
+    events:
+      - httpApi:
+          path: /
+          method: put
