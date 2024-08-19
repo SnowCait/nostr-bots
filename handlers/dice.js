@@ -25,16 +25,21 @@ export const handler = async (e) => {
   const sum = dices.reduce((sum, dice) => sum + dice + 1, 0)
   console.log('[dices]', dices, sum)
 
-  const diceStrings = [...'⚀⚁⚂⚃⚄⚅'];
   let content = face === 6
-    ? dices.map(dice => diceStrings[dice]).join('')
+    ? dices.map(dice => `:mahjong_dice${dice + 1}:`).join('')
     : dices.map(dice => dice + 1).join(', ')
-  content += `\nSum: ${sum}`
+  if (number > 1) {
+    content += `\nSum: ${sum}`
+  }
 
+  const tags = replyTags(requestEvent);
+  if (face === 6) {
+    tags.push(...dices.map(dice => ['emoji', `mahjong_dice${dice + 1}`, `https://awayuki.github.io/emoji/mahjong-dice${dice + 1}.png`]))
+  }
   const event = {
     kind: requestEvent.kind,
     created_at: Math.floor(Date.now() / 1000),
-    tags: replyTags(requestEvent),
+    tags,
     content,
     pubkey
   }
