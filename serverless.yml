@@ -1,11 +1,11 @@
 service: nostr-bots
-frameworkVersion: "3"
+frameworkVersion: "4"
 
 provider:
   name: aws
   region: ap-northeast-1
-  runtime: nodejs18.x
-  memorySize: 128
+  runtime: nodejs22.x
+  memorySize: 256
   architecture: arm64
   iam:
     role:
@@ -59,6 +59,7 @@ functions:
           path: /req
           method: post
     timeout: 15
+    runtime: nodejs20.x
   search:
     handler: handlers/search.handler
     layers:
@@ -68,6 +69,7 @@ functions:
           path: /search
           method: post
     timeout: 15
+    runtime: nodejs20.x
   random_image_register:
     handler: handlers/random_image.register
     layers:

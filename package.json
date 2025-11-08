@@ -3,5 +3,8 @@
   "dependencies": {
     "nostr-tools": "^1.11.1",
     "websocket-polyfill": "^0.0.3"
+  },
+  "devDependencies": {
+    "serverless": "^4.23.0"
   }
 }
