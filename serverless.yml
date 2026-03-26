@@ -90,6 +90,7 @@ functions:
     timeout: 15
   publish:
     handler: handlers/publish.handler
+    runtime: nodejs24.x
     events:
       - httpApi:
           path: /

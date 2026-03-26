@@ -1,6 +1,6 @@
 import { SimplePool } from "nostr-tools";
 import "websocket-polyfill";
-import relays from "../resources/relays.json" assert { type: "json" };
+import relays from "../resources/relays.json" with { type: "json" };
 
 export const handler = async (e) => {
   console.log("[request]", JSON.stringify(e));
