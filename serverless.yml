@@ -94,3 +94,6 @@ functions:
       - httpApi:
           path: /
           method: put
+
+plugins:
+  - serverless-offline
