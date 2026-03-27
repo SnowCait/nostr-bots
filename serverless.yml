@@ -59,7 +59,7 @@ functions:
           path: /req
           method: post
     timeout: 15
-    runtime: nodejs20.x
+    runtime: nodejs24.x
   search:
     handler: handlers/search.handler
     layers:
@@ -69,7 +69,7 @@ functions:
           path: /search
           method: post
     timeout: 15
-    runtime: nodejs20.x
+    runtime: nodejs24.x
   random_image_register:
     handler: handlers/random_image.register
     layers:

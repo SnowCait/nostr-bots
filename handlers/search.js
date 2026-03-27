@@ -8,8 +8,8 @@ import {
 } from "nostr-tools";
 import "websocket-polyfill";
 import { getSeckey, replyTags } from "../libs/nostr.js";
-import readRelays from "../resources/relays.json" assert { type: "json" };
-import searchRelays from "../resources/relays.search.json" assert { type: "json" };
+import readRelays from "../resources/relays.json" with { type: "json" };
+import searchRelays from "../resources/relays.search.json" with { type: "json" };
 
 const nsecKey = "nostr-search-bot-nsec";
 

@@ -6,7 +6,7 @@ import {
 } from "nostr-tools";
 import "websocket-polyfill";
 import { getSeckey, replyTags } from "../libs/nostr.js";
-import relays from "../resources/relays.json" assert { type: "json" };
+import relays from "../resources/relays.json" with { type: "json" };
 
 const nsecKey = "nostr-req-bot-nsec";
 
