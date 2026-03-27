@@ -1,70 +1,91 @@
-import { Kind, SimplePool, getEventHash, getPublicKey, getSignature, nip19 } from 'nostr-tools';
-import 'websocket-polyfill'
-import { getSeckey, replyTags } from '../libs/nostr.js';
-import readRelays from '../resources/relays.json' assert { type: 'json' };
-import searchRelays from '../resources/relays.search.json' assert { type: 'json' };
+import {
+  Kind,
+  SimplePool,
+  getEventHash,
+  getPublicKey,
+  getSignature,
+  nip19,
+} from "nostr-tools";
+import "websocket-polyfill";
+import { getSeckey, replyTags } from "../libs/nostr.js";
+import readRelays from "../resources/relays.json" assert { type: "json" };
+import searchRelays from "../resources/relays.search.json" assert { type: "json" };
 
-const nsecKey = 'nostr-search-bot-nsec';
+const nsecKey = "nostr-search-bot-nsec";
 
 export const handler = async (e) => {
-  console.log('[request]', JSON.stringify(e))
-  const json = e.isBase64Encoded ? Buffer.from(e.body, 'base64').toString() : e.body
-  console.log('[request event]', json)
+  console.log("[request]", JSON.stringify(e));
+  const json = e.isBase64Encoded
+    ? Buffer.from(e.body, "base64").toString()
+    : e.body;
+  console.log("[request event]", json);
 
-  const requestEvent = JSON.parse(json)
+  const requestEvent = JSON.parse(json);
 
-  const seckey = await getSeckey(nsecKey)
-  const pubkey = getPublicKey(seckey)
+  const seckey = await getSeckey(nsecKey);
+  const pubkey = getPublicKey(seckey);
 
   if (requestEvent.pubkey === pubkey) {
     return {
-      statusCode: 204
+      statusCode: 204,
     };
   }
 
-  const fromRegexp = /from:(nostr:)?(npub1[a-z0-9]{6,})/g
-  const toRegexp = /to:(nostr:)?(npub1[a-z0-9]{6,})/g
-  const kindRegexp = /kind:(\d+)/g
-  const fromMatches = requestEvent.content.matchAll(fromRegexp)
-  const toMatches = requestEvent.content.matchAll(toRegexp)
-  const kindMatches = requestEvent.content.matchAll(kindRegexp)
+  const fromRegexp = /from:(nostr:)?(npub1[a-z0-9]{6,})/g;
+  const toRegexp = /to:(nostr:)?(npub1[a-z0-9]{6,})/g;
+  const kindRegexp = /kind:(\d+)/g;
+  const fromMatches = requestEvent.content.matchAll(fromRegexp);
+  const toMatches = requestEvent.content.matchAll(toRegexp);
+  const kindMatches = requestEvent.content.matchAll(kindRegexp);
 
-  const fromPubkeys = [...fromMatches].map(match => match[2]).map(npub => nip19.decode(npub).data)
-  const toPubkeys = [...toMatches].map(match => match[2]).map(npub => nip19.decode(npub).data)
-  const hashtags = requestEvent.tags.filter(([tagName]) => tagName === 't').map(([, hashtag]) => hashtag)
-  hashtags.sort((x, y) => y.length - x.length)
-  const kinds = [...kindMatches].map(match => Number(match[1]))
-  console.log('[matches]', fromPubkeys, toPubkeys, hashtags, kinds)
+  const fromPubkeys = [...fromMatches]
+    .map((match) => match[2])
+    .map((npub) => nip19.decode(npub).data);
+  const toPubkeys = [...toMatches]
+    .map((match) => match[2])
+    .map((npub) => nip19.decode(npub).data);
+  const hashtags = requestEvent.tags
+    .filter(([tagName]) => tagName === "t")
+    .map(([, hashtag]) => hashtag);
+  hashtags.sort((x, y) => y.length - x.length);
+  const kinds = [...kindMatches].map((match) => Number(match[1]));
+  console.log("[matches]", fromPubkeys, toPubkeys, hashtags, kinds);
   if (kinds.length === 0) {
-    kinds.push(Kind.Text)
+    kinds.push(Kind.Text);
   }
   const query = requestEvent.content
-    .replace('nostr:npub1n2uhxrph9fgyp3u2xxqxhuz0vykt8dw8ehvw5uaesl0z4mvatpas0ngm26', '')
+    .replace(
+      "nostr:npub1n2uhxrph9fgyp3u2xxqxhuz0vykt8dw8ehvw5uaesl0z4mvatpas0ngm26",
+      "",
+    )
     .trim();
   const keyword = query
-    .replaceAll(fromRegexp, '')
-    .replaceAll(toRegexp, '')
-    .replaceAll(kindRegexp, '')
-    .replaceAll(new RegExp(`(${hashtags.map((x) => `#${x}`).join('|')})`, 'gu'), '')
+    .replaceAll(fromRegexp, "")
+    .replaceAll(toRegexp, "")
+    .replaceAll(kindRegexp, "")
+    .replaceAll(
+      new RegExp(`(${hashtags.map((x) => `#${x}`).join("|")})`, "gu"),
+      "",
+    )
     .trim();
 
   /** @param {import('nostr-tools').Filter} */
   let filter = {
-    kinds
+    kinds,
   };
   if (keyword.length > 0) {
-    filter.search = keyword
+    filter.search = keyword;
   }
   if (fromPubkeys.length > 0) {
-    filter.authors = fromPubkeys
+    filter.authors = fromPubkeys;
   }
   if (toPubkeys.length > 0) {
-    filter['#p'] = toPubkeys
+    filter["#p"] = toPubkeys;
   }
   if (hashtags.length > 0) {
-    filter['#t'] = hashtags
+    filter["#t"] = hashtags;
   }
-  console.log('[filter]', filter);
+  console.log("[filter]", filter);
 
   if (filter.limit === undefined || filter.limit > 10) {
     filter.limit = 10;
@@ -75,29 +96,32 @@ export const handler = async (e) => {
   }
 
   const relays = filter.search !== undefined ? searchRelays : readRelays;
-  console.log('[relays]', relays);
+  console.log("[relays]", relays);
 
-  const pool = new SimplePool()
-  const events = await pool.list(relays, [filter])
-  console.log('[events]', events)
+  const pool = new SimplePool();
+  const events = await pool.list(relays, [filter]);
+  console.log("[events]", events);
 
   const link = `https://nostter.app/search?q=${encodeURIComponent(query)}`;
   const event = {
     kind: requestEvent.kind,
     created_at: Math.floor(Date.now() / 1000),
     tags: replyTags(requestEvent),
-    content: events.length === 0
-      ? `No results.\n${link}`
-      : events.map(event => `nostr:${nip19.neventEncode({ id: event.id })}`).join('\n') + `\n\nMore: ${link}`,
-    pubkey
-  }
+    content:
+      events.length === 0
+        ? `No results.\n${link}`
+        : events
+            .map((event) => `nostr:${nip19.neventEncode({ id: event.id })}`)
+            .join("\n") + `\n\nMore: ${link}`,
+    pubkey,
+  };
 
-  event.id = getEventHash(event)
-  event.sig = getSignature(event, seckey)
-  console.log('[event]', event)
+  event.id = getEventHash(event);
+  event.sig = getSignature(event, seckey);
+  console.log("[event]", event);
 
   return {
     statusCode: 200,
-    body: JSON.stringify(event)
+    body: JSON.stringify(event),
   };
 };
