@@ -22,6 +22,12 @@ export const handler = async (e) => {
   const seckey = await getSeckey(nsecKey);
   const pubkey = getPublicKey(seckey);
 
+  if (requestEvent.pubkey === pubkey) {
+    return {
+      statusCode: 204,
+    };
+  }
+
   const match = requestEvent.content.match(/\{.+\}/);
   if (match === null) {
     console.warn("[invalid content]", requestEvent.content);
